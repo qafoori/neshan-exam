@@ -20,11 +20,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "baseUrl": ".",
-    "incremental": true,
-    "paths": {
-      "@/*": ["source/core/*"]
-    }
+    "incremental": true
   },
   "include": ["source/**/*", "declarations.d.ts"],
   "exclude": ["node_modules", "build"]
