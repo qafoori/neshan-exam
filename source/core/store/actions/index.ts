@@ -1,1 +1,1 @@
-export * as testActions from './test.action'
+export * as mapsActions from './maps.actions'

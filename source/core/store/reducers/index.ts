@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
-import { testReducer } from './test.reducer'
+import { mapsReducer } from './maps.reducer'
 
 export const rootReducers = combineReducers({
-  testReducer,
+  mapsReducer,
 })

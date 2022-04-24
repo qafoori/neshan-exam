@@ -4,16 +4,17 @@ import * as Lib from './lib'
 import styles from './lib/styles.module.scss'
 
 export const HomePage: FC = () => {
-  const {} = Lib.H.useHomePage()
+  const { baseMapsProps } = Lib.H.useHomePage()
+  const { MAP_BOX_API_KEY } = process.env
 
   return (
     <div className={styles.container}>
       <div>
-        <MapBox />
+        <MapBox {...baseMapsProps} accessToken={MAP_BOX_API_KEY ?? ''} />
       </div>
 
       <div>
-        <OpenLayers />
+        <OpenLayers {...baseMapsProps} />
       </div>
     </div>
   )

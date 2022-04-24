@@ -14,6 +14,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-geocoder": "^5.0.0",
     "mapbox-gl": "^2.8.1",
     "ol": "^6.14.1",
     "react": "^18.0.0",
@@ -32,6 +33,9 @@
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
     "@babel/runtime": "^7.17.9",
+    "@types/dotenv-webpack": "^7.0.3",
+    "@types/mapbox-gl": "^2.7.0",
+    "@types/mapbox__mapbox-gl-geocoder": "^4.7.2",
     "@types/react": "^18.0.5",
     "@types/react-dom": "^18.0.1",
     "@types/react-helmet": "^6.1.5",
@@ -40,6 +44,7 @@
     "babel-loader": "^8.2.5",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.7.1",
+    "dotenv-webpack": "^7.1.0",
     "eslint": "^8.13.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
