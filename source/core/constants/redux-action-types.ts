@@ -1,1 +1,5 @@
-export const TEST = 'TEST'
+export const MAP = {
+  ZOOM: 'ZOOM',
+  ROTATION: 'ROTATION',
+  COORDS: 'COORDS',
+}
