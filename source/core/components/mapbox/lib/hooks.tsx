@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js', e => e && console.error(e), true)
 
-export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationChange, onZoomChange, searchResult, accessToken, onClear }: Lib.T.MapboxProps) => {
+export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationChange, onZoomChange, searchResult, accessToken, onClear, geoCoderId, onQueryChange, query }: Lib.T.MapboxProps) => {
   const mapElement = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<Map | null>(null)
   const markers = useRef<(Lib.T.TypedMarker | null)[]>([])
@@ -27,7 +27,6 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
     }
     const map = new mapboxgl.Map(options)
     map.on('moveend', onMove)
-    map.on('click', onClick)
     mapRef.current = map
   }
 
@@ -68,6 +67,7 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
   const onResultClear = () => {
     clearMarkers('searched')
     onClear && onClear()
+    onQueryChange && onQueryChange('')
   }
 
   const onResult = () => {
@@ -85,14 +85,6 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
     addMarker([lat, lng], 'searched')
     current.setZoom(15)
     current.setCenter(coords)
-  }
-
-  const onClick = (evt: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
-    if (!mapRef.current) {
-      return
-    }
-    const { lngLat } = evt
-    addMarker([lngLat.lng, lngLat.lat], 'clicked')
   }
 
   const addMarker = (coords: [number, number], type: Lib.T.MarkerType) => {
@@ -123,10 +115,32 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
     })
   }
 
+  const addInputListener = () => {
+    const input = document.querySelector(`#${geoCoderId} input`) as HTMLInputElement | null
+    if (!input) {
+      return
+    }
+
+    input.addEventListener('input', () => {
+      const { value } = input
+      onQueryChange && onQueryChange(value)
+    })
+  }
+
+  const onQuery = () => {
+    const input = document.querySelector(`#${geoCoderId} input`) as HTMLInputElement | null
+    if (!input || !query) {
+      return
+    }
+    input.value = query
+  }
+
   useEffect(createMap, [])
   useEffect(onCoords, [lat, lng])
   useEffect(onZoom, [zoom])
   useEffect(onRotate, [rotation])
   useEffect(onResult, [searchResult])
+  useEffect(addInputListener, [])
+  useEffect(onQuery, [query])
   return { mapElement, onResultClear }
 }

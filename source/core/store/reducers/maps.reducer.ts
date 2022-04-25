@@ -1,12 +1,12 @@
 import { actionTypes } from '../../constants'
 import { StoreAction } from '../../types/store.type'
 import { OutputResult } from '../../components/geo-coder/lib/types'
-import { Coords } from '../../types/map.types'
 
 const initialState = {
   zoom: 5,
   rotation: 0,
   geoRes: <OutputResult | undefined>undefined,
+  query: '',
   coords: {
     lat: 32.6516,
     lng: 53.7709,
@@ -40,6 +40,13 @@ export const mapsReducer = (states = initialState, { type, payload }: ReturnType
       return {
         ...states,
         geoRes: payload,
+      }
+    }
+
+    case actionTypes.MAP.QUERY: {
+      return {
+        ...states,
+        query: payload,
       }
     }
 
