@@ -1,8 +1,6 @@
 import { rootReducers } from '../store/reducers'
 
-export type StoreAction<ReturnType = any> = (
-  payload: ReturnType,
-) => {
+export type StoreAction<ReturnType = any> = (payload: ReturnType) => {
   type: string
   payload: ReturnType
 }

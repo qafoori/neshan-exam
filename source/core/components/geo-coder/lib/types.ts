@@ -7,6 +7,11 @@ export interface GeoCoderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'id'
   onResult?: (result: OutputResult) => void
 }
 
+/**
+ *
+ *
+ * manipulated an clean result from geocoder
+ */
 export type OutputResult = {
   coords: [number, number]
   wiki: string
@@ -15,6 +20,12 @@ export type OutputResult = {
   city: string
 }
 
+/**
+ *
+ *
+ * dirty result from geocoder
+ * this type defined because geocoder package doesn't have this type it self
+ */
 export type InputResult = {
   id: string
   type: string

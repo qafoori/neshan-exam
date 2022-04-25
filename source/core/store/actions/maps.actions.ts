@@ -23,7 +23,6 @@ export const setGeoResult: StoreAction<OutputResult | undefined> = payload => ({
   payload,
 })
 
-
 export const setQuery: StoreAction<string> = payload => ({
   type: actionTypes.MAP.QUERY,
   payload,

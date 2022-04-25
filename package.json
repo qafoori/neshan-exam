@@ -10,8 +10,7 @@
     "dev": "webpack serve --config webpack.config.js --env env=development",
     "build": "webpack --config webpack.config.js --env env=production",
     "lint": "eslint --fix \"./source/**/*.{js,jsx,ts,tsx,json}\"",
-    "format": "prettier --write \"./source/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --write \"./source/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.0.0",
