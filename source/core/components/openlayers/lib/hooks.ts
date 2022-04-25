@@ -10,7 +10,7 @@ import Point from 'ol/geom/Point'
 import { Vector as VectorLayer } from 'ol/layer'
 import { fromLonLat, transform } from 'ol/proj'
 
-export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotationChange, onZoomChange, searchResult, onClear }: Lib.T.OpenLayersProps) => {
+export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotationChange, onZoomChange, searchResult, onClear, geoCoderId, onQueryChange, query }: Lib.T.OpenLayersProps) => {
   const mapElement = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<ol.Map | null>(null)
   const markers = useRef<(Lib.T.TypedMarker | null)[]>([])
@@ -34,7 +34,6 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     }
     const map = new Map(options)
     map.on('moveend', onMove)
-    map.on('click', onClick)
     mapRef.current = map
   }
 
@@ -73,6 +72,7 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
   const onResultClear = () => {
     clearMarkers('searched')
     onClear && onClear()
+    onQueryChange && onQueryChange('')
   }
 
   const onResult = () => {
@@ -91,15 +91,6 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     addMarker([lat, lng], 'searched')
     current.getView().setZoom(15)
     current.getView().setCenter(coords)
-  }
-
-  const onClick = (evt: ol.MapBrowserEvent<any>) => {
-    if (!mapRef.current) {
-      return
-    }
-    const clickedCoord = mapRef.current.getCoordinateFromPixel(evt.pixel)
-    const [lat, lng] = transform(clickedCoord, 'EPSG:3857', 'EPSG:4326')
-    addMarker([lat, lng], 'clicked')
   }
 
   const addMarker = (coords: [number, number], type: 'searched' | 'clicked') => {
@@ -142,10 +133,32 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     })
   }
 
+  const addInputListener = () => {
+    const input = document.querySelector(`#${geoCoderId} input`) as HTMLInputElement | null
+    if (!input) {
+      return
+    }
+
+    input.addEventListener('input', () => {
+      const { value } = input
+      onQueryChange && onQueryChange(value)
+    })
+  }
+
+  const onQuery = () => {
+    const input = document.querySelector(`#${geoCoderId} input`) as HTMLInputElement | null
+    if (!input || !query) {
+      return
+    }
+    input.value = query
+  }
+
   useEffect(createMap, [])
   useEffect(onCoords, [lat, lng])
   useEffect(onZoom, [zoom])
   useEffect(onRotate, [rotation])
   useEffect(onResult, [searchResult])
+  useEffect(addInputListener, [])
+  useEffect(onQuery, [query])
   return { mapElement, onResultClear }
 }

@@ -22,3 +22,9 @@ export const setGeoResult: StoreAction<OutputResult | undefined> = payload => ({
   type: actionTypes.MAP.GEO_RES,
   payload,
 })
+
+
+export const setQuery: StoreAction<string> = payload => ({
+  type: actionTypes.MAP.QUERY,
+  payload,
+})

@@ -7,9 +7,11 @@ export interface MapboxProps extends Omit<GeoCoderProps, 'id'> {
   rotation: number
   geoCoderId: string
   searchResult?: OutputResult
+  query?: string
   onZoomChange?: (zoom: number) => void
   onCoordsChange?: (latitude: number, longitude: number) => void
   onRotationChange?: (rotation: number) => void
+  onQueryChange?: (query: string) => void
 }
 
 export type Coords = { lat: number; lng: number }
