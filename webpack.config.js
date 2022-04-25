@@ -1,7 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-const { DefinePlugin } = require('webpack')
 const Dotenv = require('dotenv-webpack')
 
 module.exports = {
@@ -41,15 +40,15 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, './source/index.html'),
+      template: path.resolve(__dirname, './static/index.html'),
     }),
     new CleanWebpackPlugin(),
     new Dotenv(),
   ],
   devServer: {
-    static: path.join(__dirname, './source'),
+    static: path.join(__dirname, './static'),
     port: 1234,
-    hot: 'only',
+    hot: true,
     compress: true,
     open: true,
   },

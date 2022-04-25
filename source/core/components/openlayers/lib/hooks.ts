@@ -4,10 +4,16 @@ import View from 'ol/View'
 import * as ol from 'ol'
 import * as Lib from '.'
 import { MapOptions } from 'ol/PluggableMap'
+import VectorSource from 'ol/source/Vector'
+import { Icon, Style } from 'ol/style'
+import Point from 'ol/geom/Point'
+import { Vector as VectorLayer } from 'ol/layer'
+import { fromLonLat, transform } from 'ol/proj'
 
-export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotationChange, onZoomChange }: Lib.T.OpenLayersProps) => {
+export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotationChange, onZoomChange, searchResult, onClear }: Lib.T.OpenLayersProps) => {
   const mapElement = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<ol.Map | null>(null)
+  const markers = useRef<(Lib.T.TypedMarker | null)[]>([])
   const { lat, lng } = coords
 
   const createMap = () => {
@@ -28,6 +34,7 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     }
     const map = new Map(options)
     map.on('moveend', onMove)
+    map.on('click', onClick)
     mapRef.current = map
   }
 
@@ -41,9 +48,7 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
       if (onZoomChange) {
         onZoomChange(current.getView().getZoom()! - 1)
       }
-      // if (onRotationChange) {
-      //   onRotationChange(current.getView().getRotation())
-      // }
+      // if (onRotationChange) { onRotationChange(current.getView().getRotation()) }
     }
   }
 
@@ -65,18 +70,82 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     }
   }
 
+  const onResultClear = () => {
+    clearMarkers('searched')
+    onClear && onClear()
+  }
+
+  const onResult = () => {
+    const { current } = mapRef
+    if (!current) {
+      return
+    }
+    if (!searchResult) {
+      clearMarkers('searched')
+      return
+    }
+
+    const { address, city, coords, country, wiki } = searchResult
+    const [lat, lng] = transform(coords, 'EPSG:3857', 'EPSG:4326')
+
+    addMarker([lat, lng], 'searched')
+    current.getView().setZoom(15)
+    current.getView().setCenter(coords)
+  }
+
+  const onClick = (evt: ol.MapBrowserEvent<any>) => {
+    if (!mapRef.current) {
+      return
+    }
+    const clickedCoord = mapRef.current.getCoordinateFromPixel(evt.pixel)
+    const [lat, lng] = transform(clickedCoord, 'EPSG:3857', 'EPSG:4326')
+    addMarker([lat, lng], 'clicked')
+  }
+
+  const addMarker = (coords: [number, number], type: 'searched' | 'clicked') => {
+    const { current } = mapRef
+    if (!current) {
+      return
+    }
+    const iconFeature = new ol.Feature({
+      geometry: new Point(fromLonLat(coords)),
+    })
+    const marker = new VectorLayer({
+      source: new VectorSource({
+        features: [iconFeature],
+      }),
+      style: new Style({
+        image: new Icon({
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'pixels',
+          src: `${type}-marker.png`,
+          anchorOrigin: 'bottom-left',
+        }),
+      }),
+    }) as Lib.T.TypedMarker
+
+    marker.type = type
+    markers.current = [...markers.current, marker]
+    current.addLayer(marker)
+  }
+
+  const clearMarkers = (markerType?: Lib.T.MarkerType) => {
+    const { current } = mapRef
+    if (!current) {
+      return
+    }
+
+    const marks = markerType ? markers.current.filter(marker => marker?.type === markerType) : markers.current
+    marks.forEach((marker, index) => {
+      marker && current.removeLayer(marker)
+      markers.current[index] = null
+    })
+  }
+
   useEffect(createMap, [])
   useEffect(onCoords, [lat, lng])
   useEffect(onZoom, [zoom])
   useEffect(onRotate, [rotation])
-  return mapElement
+  useEffect(onResult, [searchResult])
+  return { mapElement, onResultClear }
 }
-
-// const onMapClick = (evt: ol.MapBrowserEvent<any>) => {
-//   if (!mapRef.current) {
-//     return
-//   }
-//   const clickedCoord = mapRef.current.getCoordinateFromPixel(evt.pixel)
-//   const transformedCoord = transform(clickedCoord, 'EPSG:3857', 'EPSG:4326')
-//   console.log(transformedCoord)
-// }
