@@ -10,12 +10,18 @@ import Point from 'ol/geom/Point'
 import { Vector as VectorLayer } from 'ol/layer'
 import { fromLonLat, transform } from 'ol/proj'
 
-export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotationChange, onZoomChange, searchResult, onClear, geoCoderId, onQueryChange, query }: Lib.T.OpenLayersProps) => {
+export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onZoomChange, searchResult, onClear, geoCoderId, onQueryChange, query }: Lib.T.OpenLayersProps) => {
   const mapElement = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<ol.Map | null>(null)
   const markers = useRef<(Lib.T.TypedMarker | null)[]>([])
   const { lat, lng } = coords
 
+  /**
+   *
+   *
+   *
+   * initiates the map and first functionalities
+   */
   const createMap = () => {
     if (!mapElement.current) {
       return
@@ -37,6 +43,12 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     mapRef.current = map
   }
 
+  /**
+   *
+   *
+   *
+   * when user moves the map, dispatches new values for `coordinates`, `zoom`, `rotation`
+   */
   const onMove = () => {
     const { current } = mapRef
     if (current) {
@@ -51,30 +63,60 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     }
   }
 
-  const onZoom = () => {
-    if (mapRef.current) {
-      mapRef.current.getView().setZoom(zoom + 1)
-    }
-  }
-
+  /**
+   *
+   *
+   *
+   * updates map coords when they change from outside of this module
+   */
   const onCoords = () => {
     if (mapRef.current) {
       mapRef.current.getView().setCenter([lng, lat])
     }
   }
 
+  /**
+   *
+   *
+   *
+   * updates map zoom when it change from outside of this module
+   */
+  const onZoom = () => {
+    if (mapRef.current) {
+      mapRef.current.getView().setZoom(zoom + 1)
+    }
+  }
+
+  /**
+   *
+   *
+   *
+   * updates map rotation when it change from outside of this module
+   */
   const onRotate = () => {
     if (mapRef.current) {
       mapRef.current.getView().setRotation((-1 * rotation) / 30 / Math.PI)
     }
   }
 
+  /**
+   *
+   *
+   *
+   * triggers when user clears the result of geocoder component
+   */
   const onResultClear = () => {
     clearMarkers('searched')
     onClear && onClear()
     onQueryChange && onQueryChange('')
   }
 
+  /**
+   *
+   *
+   *
+   * triggers when user chooses one of the suggested results from geocoder component
+   */
   const onResult = () => {
     const { current } = mapRef
     if (!current) {
@@ -85,7 +127,7 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
       return
     }
 
-    const { address, city, coords, country, wiki } = searchResult
+    const { coords } = searchResult
     const [lat, lng] = transform(coords, 'EPSG:3857', 'EPSG:4326')
 
     addMarker([lat, lng], 'searched')
@@ -93,6 +135,12 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     current.getView().setCenter(coords)
   }
 
+  /**
+   *
+   *
+   *
+   * adds a marker to the map
+   */
   const addMarker = (coords: [number, number], type: 'searched' | 'clicked') => {
     const { current } = mapRef
     if (!current) {
@@ -120,6 +168,12 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     current.addLayer(marker)
   }
 
+  /**
+   *
+   *
+   *
+   * clears markers by their type, if `markerType = undefined` will clear all markers
+   */
   const clearMarkers = (markerType?: Lib.T.MarkerType) => {
     const { current } = mapRef
     if (!current) {
@@ -133,6 +187,12 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     })
   }
 
+  /**
+   *
+   *
+   *
+   * add a `input` listener to the geocoder input, in order to listen to it's changes and trigger `onQueryChange` function if passed
+   */
   const addInputListener = () => {
     const input = document.querySelector(`#${geoCoderId} input`) as HTMLInputElement | null
     if (!input) {
@@ -145,6 +205,12 @@ export const useOpenLayers = ({ coords, rotation, zoom, onCoordsChange, onRotati
     })
   }
 
+  /**
+   *
+   *
+   *
+   * triggers when query for the `geocoder` changes
+   */
   const onQuery = () => {
     const input = document.querySelector(`#${geoCoderId} input`) as HTMLInputElement | null
     if (!input || !query) {

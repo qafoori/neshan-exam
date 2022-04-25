@@ -1,8 +1,14 @@
 import { FC } from 'react'
 import * as Lib from './lib'
-import { GeoCoder } from '../geo-coder'
+import { GeoCoder } from '..'
 import styles from './lib/styles.module.scss'
 
+/***
+ *
+ *
+ *
+ * built to make it easier to use `openlayers`
+ */
 export const OpenLayers: FC<Lib.T.OpenLayersProps> = props => {
   const { mapElement, onResultClear } = Lib.H.useOpenLayers(props)
   const { accessToken, geoCoderId, onResult } = props

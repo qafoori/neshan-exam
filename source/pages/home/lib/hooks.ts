@@ -16,6 +16,12 @@ export const useHomePage = () => {
   const { lat, lng } = coords
   const { MAP_BOX_API_KEY } = process.env
 
+  /**
+   *
+   *
+   *
+   * updates the url search query parameters when one of the associated states changes
+   */
   const updateURL = () => {
     const searchObj: Lib.T.URLQueries = {
       lat: coords.lat.toString(),
@@ -29,6 +35,12 @@ export const useHomePage = () => {
     navigate(`?${searchString}`, { replace: true })
   }
 
+  /**
+   *
+   *
+   *
+   * checks the url search queries on first load and adds the desired setting to the maps
+   */
   const checkURL = () => {
     const searchString = location.search
     const { geoRes, lat, lng, query, rotation, zoom } = <Lib.T.URLQueries>Object.fromEntries(new URLSearchParams(searchString))
@@ -50,12 +62,42 @@ export const useHomePage = () => {
     }
   }
 
+  /**
+   *
+   * updates zoom state
+   */
   const updateZoom = (newZoom: number) => dispatch(mapsActions.setMapZoom(newZoom))
+
+  /**
+   *
+   * updates rotation state
+   */
   const updateRotation = (newRotation: number) => dispatch(mapsActions.setMapRotation(newRotation))
+
+  /**
+   *
+   * updates coords (lat, lng) state
+   */
   const updateCoords = (lat: number, lng: number) => dispatch(mapsActions.setMapCoords({ lat, lng }))
+
+  /**
+   *
+   * updates search result state
+   */
   const updateSearchResult = (res?: OutputResult) => dispatch(mapsActions.setGeoResult(res))
+
+  /**
+   *
+   * updates query state
+   */
   const updateQuery = (query: string) => dispatch(mapsActions.setQuery(query))
 
+  /**
+   *
+   *
+   *
+   * base props for both `OpenLayers` & `MapBox` components which has same keys and values
+   */
   const baseMapsProps: Omit<OpenLayersProps, 'geoCoderId'> = {
     coords: { lat, lng },
     accessToken: MAP_BOX_API_KEY ?? '',

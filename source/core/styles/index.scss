@@ -1,5 +1,4 @@
 @import url('mapbox-gl/dist/mapbox-gl.css');
-// @import url('../components/openlayers/lib/styles.scss');
 @import url('@mapbox/mapbox-gl-geocoder/lib/mapbox-gl-geocoder.css');
 
 body,
@@ -14,26 +13,3 @@ html {
   box-sizing: border-box;
   font-family: tahoma, 'Courier New', Courier, monospace !important;
 }
-
-// .mapboxgl-ctrl-top-right {
-//   position: fixed;
-//   top: 20px;
-//   left: 0;
-//   right: 0;
-//   margin: auto;
-
-//   > div {
-//     float: unset !important;
-//     margin: auto !important;
-
-//     input {
-//       text-align: right;
-//     }
-//   }
-// }
-
-// @media screen and (max-width: 640px) {
-//   .mapboxgl-ctrl-top-right {
-//     padding: 0 20px;
-//   }
-// }

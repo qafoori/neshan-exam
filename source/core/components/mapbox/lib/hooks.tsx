@@ -1,6 +1,6 @@
 import * as Lib from '.'
 import mapboxgl, { Map } from 'mapbox-gl'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 mapboxgl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js', e => e && console.error(e), true)
 
@@ -10,6 +10,12 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
   const markers = useRef<(Lib.T.TypedMarker | null)[]>([])
   const { lat, lng } = coords
 
+  /**
+   *
+   *
+   *
+   * initiates the map and first functionalities
+   */
   const createMap = () => {
     if (mapRef.current || !mapElement.current) {
       return
@@ -30,6 +36,12 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
     mapRef.current = map
   }
 
+  /**
+   *
+   *
+   *
+   * when user moves the map, dispatches new values for `coordinates`, `zoom`, `rotation`
+   */
   const onMove = () => {
     const { current } = mapRef
     if (current) {
@@ -46,30 +58,60 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
     }
   }
 
+  /**
+   *
+   *
+   *
+   * updates map coords when they change from outside of this module
+   */
   const onCoords = () => {
     if (mapRef.current) {
       mapRef.current.setCenter({ lat, lng })
     }
   }
 
+  /**
+   *
+   *
+   *
+   * updates map zoom when it change from outside of this module
+   */
   const onZoom = () => {
     if (mapRef.current) {
       mapRef.current.setZoom(zoom)
     }
   }
 
+  /**
+   *
+   *
+   *
+   * updates map rotation when it change from outside of this module
+   */
   const onRotate = () => {
     if (mapRef.current) {
       mapRef.current.setBearing(rotation)
     }
   }
 
+  /**
+   *
+   *
+   *
+   * triggers when user clears the result of geocoder component
+   */
   const onResultClear = () => {
     clearMarkers('searched')
     onClear && onClear()
     onQueryChange && onQueryChange('')
   }
 
+  /**
+   *
+   *
+   *
+   * triggers when user chooses one of the suggested results from geocoder component
+   */
   const onResult = () => {
     const { current } = mapRef
     if (!current) {
@@ -79,7 +121,7 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
       clearMarkers('searched')
       return
     }
-    const { address, city, coords, country, wiki } = searchResult
+    const { coords } = searchResult
     const [lat, lng] = coords
 
     addMarker([lat, lng], 'searched')
@@ -87,6 +129,12 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
     current.setCenter(coords)
   }
 
+  /**
+   *
+   *
+   *
+   * adds a marker to the map
+   */
   const addMarker = (coords: [number, number], type: Lib.T.MarkerType) => {
     const { current } = mapRef
     if (!current) {
@@ -107,6 +155,12 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
     marker.addTo(current)
   }
 
+  /**
+   *
+   *
+   *
+   * clears markers by their type, if `markerType = undefined` will clear all markers
+   */
   const clearMarkers = (markerType?: Lib.T.MarkerType) => {
     const marks = markerType ? markers.current.filter(marker => marker?.type === markerType) : markers.current
     marks.forEach((marker, index) => {
@@ -115,6 +169,12 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
     })
   }
 
+  /**
+   *
+   *
+   *
+   * add a `input` listener to the geocoder input, in order to listen to it's changes and trigger `onQueryChange` function if passed
+   */
   const addInputListener = () => {
     const input = document.querySelector(`#${geoCoderId} input`) as HTMLInputElement | null
     if (!input) {
@@ -127,6 +187,12 @@ export const useMapBox = ({ coords, rotation, zoom, onCoordsChange, onRotationCh
     })
   }
 
+  /**
+   *
+   *
+   *
+   * triggers when query for the `geocoder` changes
+   */
   const onQuery = () => {
     const input = document.querySelector(`#${geoCoderId} input`) as HTMLInputElement | null
     if (!input || !query) {

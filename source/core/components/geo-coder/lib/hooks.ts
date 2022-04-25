@@ -1,27 +1,37 @@
-import * as Lib from '.'
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import { useEffect, useRef } from 'react'
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
+import * as Lib from '.'
 
 export const useGeoCoder = ({ accessToken, onClear, onResult }: Pick<Lib.T.GeoCoderProps, 'accessToken' | 'onClear' | 'onResult'>) => {
   const geoCoderRef = useRef<HTMLDivElement | null>(null)
 
+  /**
+   *
+   *
+   *
+   * initiates the geocoder component first logics
+   */
   const makeGeoCoder = () => {
     if (!geoCoderRef.current) {
       return
     }
-
     const geocoder = new MapboxGeocoder({
       accessToken: accessToken,
       types: 'country,region,place,postcode,locality,neighborhood',
       language: 'fa',
       localGeocoder: coordinatesGeocoder,
     })
-
     geocoder.addTo(`#${geoCoderRef.current.id}`)
     geocoder.on('result', ({ result }) => onResult && onResult(manipulateResult(result)))
     geocoder.on('clear', () => onClear && onClear())
   }
 
+  /**
+   *
+   *
+   *
+   * manipulates the results came  from "MapboxGeocoder". it will be dirty without this function
+   */
   const manipulateResult = ({ place_name_fa, center, properties, context, text_fa }: Lib.T.InputResult): Lib.T.OutputResult => ({
     address: place_name_fa,
     coords: center,
@@ -30,6 +40,12 @@ export const useGeoCoder = ({ accessToken, onClear, onResult }: Pick<Lib.T.GeoCo
     city: text_fa,
   })
 
+  /***
+   *
+   *
+   *
+   * adds ability to query the map via coordinates
+   */
   const coordinatesGeocoder = (query: string): MapboxGeocoder.Result[] => {
     const matches = query.match(/^[ ]*(?:Lat: )?(-?\d+\.?\d*)[, ]+(?:Lng: )?(-?\d+\.?\d*)[ ]*$/i)
     if (!matches) {
